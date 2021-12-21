@@ -54,5 +54,41 @@ then
 fi
 }
 
+inventoryMgmt () {
+	inventoryFile=/var/www/html/inventory.html
+        logType="httpd-logs"
+        type=${fileName##*.}
+        size=$(ls -lh /tmp/${fileName}| cut -d " " -f5)
+        if ! test -f "$inventoryFile"; then
+		echo " "
+                echo "Creating Inventory file /var/www/html/inventory.html"
+                touch ${inventoryFile}
+                echo "<b>Log Type&nbsp;&nbsp;&nbsp;&nbsp;Date Created&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type&nbsp;&nbsp;&nbsp;&nbsp;Size</b>">${inventoryFile}
+        fi
+        echo "<br>${logType}&nbsp;&nbsp;&nbsp;&nbsp;${timeStamp}&nbsp;&nbsp;&nbsp;&nbsp;${type}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${size}">>${inventoryFile}
+        echo "Log Archive status updated in Inventory file"
+	echo " "
+}
+
+scheduleCron () {
+	cronFile="/etc/cron.d/automation"
+	if [ ! -f "$cronFile" ]
+	then
+		echo "00 00 * * * root /root/Automation_Project/automation.sh" > "$cronFile"
+		if [ $(echo $?) = 0 ]
+		then
+			echo "Scheduling CronJob : SUCCESS"
+		else
+			echo "Scheduling CronJob : FAILED"
+		fi
+		echo " "
+	else
+		echo "Cronjob Already Configured"
+		echo " "
+	fi
+}
+
 apacheSetup
 logArchive
+inventoryMgmt
+scheduleCron
